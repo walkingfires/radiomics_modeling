@@ -1,0 +1,27 @@
+setting:
+  binCount: 32
+  label: 1
+  symmetricalGLCM: True
+  correctMask: True
+
+imageType:
+  Original: {}
+
+featureClass:
+  firstorder:
+    - 'Variance'
+  glcm:
+    - 'Correlation'
+  gldm:
+    - 'DependenceNonUniformity'
+    - 'GrayLevelNonUniformity'
+    - 'LargeDependenceLowGrayLevelEmphasis'
+  glrlm:
+    - 'GrayLevelNonUniformity'
+    - 'LongRunLowGrayLevelEmphasis'
+    - 'RunLengthNonUniformity'
+  glszm:
+    - 'LowGrayLevelZoneEmphasis'
+    - 'ZoneEntropy'
+  ngtdm:
+    - 'Complexity'
