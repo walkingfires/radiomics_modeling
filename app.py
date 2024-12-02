@@ -41,6 +41,10 @@ def save_uploaded_file(uploaded_file, save_path):
 
 # Main function to run the Streamlit app
 def main():
+
+    if not os.path.isdir("static"):
+        os.mkdir("static")
+
     st.set_page_config(
         page_title="Radiomics Predictor",
         page_icon="🧊")
@@ -81,7 +85,7 @@ def main():
         show_image = st.checkbox("Show MRI with Mask")
 
     # Button to process the files
-    if st.button("Predict ", key="html_button"):
+    if st.button("Predict lesion group", key="html_button"):
         if t2_mri is not None and mask is not None:
             save_uploaded_file(t2_mri, os.path.join("static", t2_mri.name))
             save_uploaded_file(mask, os.path.join("static", mask.name))
