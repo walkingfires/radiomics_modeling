@@ -29,7 +29,7 @@ class Predictor:
             logging.error('Predictor: Model not found')
             raise ValueError('Predictor: Model not found.')
 
-    def predict(self, data: dict):
+    def predict(self, data: dict) -> int:
         """
         Предсказание на основе входных данных
 

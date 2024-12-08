@@ -1,14 +1,26 @@
 import os
 import streamlit as st
-
+import logging
 from feature_extracting import FeatureExtractor
 from preprocessing import Preprocessor
 from predicting import Predictor
 from image_viewing import ImageViewer
 
 
-# Function to process the uploaded files
-def process_files(image_name: str, mask_name: str, clinical_data: dict):
+def process_result(image_name: str, mask_name: str, clinical_data: dict, show: bool) -> int:
+    """
+    Подготовка результата: загрузка, предобработка, извлечение признаков и предсказание
+
+    Параметры:
+    - image_name: Имя файла изображения
+    - mask_name: Имя файла маски
+    - clinical_data: Клинические данные
+    - show: Флаг, указывающий, нужно ли отобразить изображение
+
+    Возвращает:
+    - result: Результат предсказания
+    """
+    logging.info('App: Prosessing result')
     model = 'liver_t2w_xgboost'
     preprocessor = Preprocessor(mri_modality='T2')
     feature_extractor = FeatureExtractor(model, desired_order_bool=False)
@@ -19,12 +31,10 @@ def process_files(image_name: str, mask_name: str, clinical_data: dict):
 
     image, mask = preprocessor.preprocessing_step(image_path, mask_path, normalize=True, resample=False)
 
-    visualizer = ImageViewer(image, mask)
+    if show:
+        visualizer = ImageViewer(image, mask)
+        visualizer.show()
 
-    # Save the visualized image
-    visualizer.show()
-
-    # Remove the uploaded files after processing
     os.remove(image_path)
     os.remove(mask_path)
 
@@ -34,12 +44,20 @@ def process_files(image_name: str, mask_name: str, clinical_data: dict):
     return predictor.predict(data)
 
 
-def save_uploaded_file(uploaded_file, save_path):
+def save_uploaded_file(uploaded_file, save_path: str) -> None:
+    """
+    Сохранение загруженного файла
+
+    Параметры:
+    - uploaded_file: Загруженный файл
+    - save_path: Путь для сохранения файла
+    """
     with open(save_path, "wb") as f:
+        logging.info('App: Saving uploaded file')
         f.write(uploaded_file.getbuffer())
 
 
-# Main function to run the Streamlit app
+# Главная функция для запуска приложения Streamlit
 def main():
 
     if not os.path.isdir("static"):
@@ -84,7 +102,7 @@ def main():
         age = st.number_input("Enter Age", min_value=18, value=45)
         show_image = st.checkbox("Show MRI with Mask")
 
-    # Button to process the files
+    # Кнопка для обработки файлов
     if st.button("Predict lesion group", key="html_button"):
         if t2_mri is not None and mask is not None:
             save_uploaded_file(t2_mri, os.path.join("static", t2_mri.name))
@@ -94,7 +112,7 @@ def main():
                 'sex': 'F' if gender == 'Female' else 'M',
                 'manufacturer': manufacturer
             }
-            result = process_files(t2_mri.name, mask.name, clinical_data)
+            result = process_result(t2_mri.name, mask.name, clinical_data, show_image)
 
             if result:
                 st.write("Malignant lesion (intrahepatic cholangiocarcinoma, hepatocellular carcinoma)")
@@ -102,7 +120,7 @@ def main():
                 st.write(f"Benign lesion (hepatocellular adenoma, focal nodular hyperplasia)")
 
             if show_image:
-                image_path = "static/show_slice.jpg"  # Ensure this path is correct
+                image_path = "static/show_slice.jpg"  # Убедитесь, что путь корректен
                 if os.path.exists(image_path):
                     st.image(image_path, caption="MRI with Mask", use_container_width=True)
                     os.remove(image_path)
@@ -113,4 +131,5 @@ def main():
 
 
 if __name__ == "__main__":
+    logging.info("App: App started")
     main()
