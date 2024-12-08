@@ -9,10 +9,29 @@ from intensity_normalization.typing import Modality
 
 class Preprocessor:
     """
-    Инициализация класса Preprocessor для предобработки изображений и масок.
+    Класс Preprocessor предназначен для предобработки медицинских изображений и масок
+
+    Атрибуты:
+    - mri_modality (str): Модальность МРТ, может быть 'T1' или 'T2'
+    - save (bool): Флаг, указывающий, нужно ли сохранять обработанные данные
+
+    Методы:
+    - __init__(self, mri_modality: str, save=False): Инициализация класса Preprocessor
+    - normalize(self, image: sitk.Image) -> sitk.Image: Нормализация изображения
+    - intensity_normalize(self, image: sitk.Image) -> sitk.Image: Нормализация интенсивности изображения
+    - new_image_preprocessing(self, input_path, normalize=True, resample=True): Предобработка нового изображения
+    - mask_preprocessing(self, input_path, resample=True): Предобработка маски
+    - preprocessing_step(self, image_path, mask_path, normalize=True, resample=True): Предобработка изображения и маски
     """
 
     def __init__(self, mri_modality: str, save=False):
+        """
+        Инициализация класса Preprocessor
+
+        Параметры:
+        - mri_modality (str): Модальность МРТ, может быть 'T1' или 'T2'
+        - save (bool): Флаг, указывающий, нужно ли сохранять обработанные данные
+        """
         logging.info('Initializing Preprocessor class.')
         self.save = save
         self.normalizer = ZScoreNormalize()
@@ -21,26 +40,21 @@ class Preprocessor:
         elif mri_modality == 'T2':
             self.modality = Modality.T2
         else:
-            raise ValueError("Invalid modality choice. Choose 'T1' or 'T2'.")
+            logging.error('Invalid modality choice')
+            raise ValueError("Invalid modality choice. Choose 'T1' or 'T2'")
 
     @staticmethod
     def normalize(image: sitk.Image) -> sitk.Image:
         """
-        Normalize the given SimpleITK image.
+        Z-score нормализация изображения
 
-        This method flattens the input image into a 1D array, computes the mean and standard deviation,
-        and then normalizes the image by subtracting the mean and dividing by the standard deviation.
+        Параметры:
+        - image (sitk.Image): Входное изображение
 
-        Parameters:
-        ----------
-        image : sitk.Image
-            The input image to be normalized, represented as a SimpleITK image object.
-
-        Returns:
-        -------
-        sitk.Image
-            The normalized image, represented as a SimpleITK image object.
+        Возвращает:
+        - sitk.Image: Нормализованное изображение
         """
+        logging.info('Normalizing image')
         flatten_image_array = sitk.GetArrayFromImage(image).flatten()
         mu, std = np.mean(flatten_image_array), np.std(flatten_image_array)
         normalized_image = (image - mu) / std
@@ -48,20 +62,33 @@ class Preprocessor:
         return normalized_image
 
     def intensity_normalize(self, image: sitk.Image) -> sitk.Image:
+        """
+        Нормализация интенсивности изображения пакетом intensity_normalization
+
+        Параметры:
+        - image (sitk.Image): Входное изображение
+
+        Возвращает:
+        - sitk.Image: Нормализованное изображение
+        """
+        logging.info('Normalizing image intensity')
         array = np.asanyarray(sitk.GetArrayFromImage(image))
         normalized_array = np.asanyarray(self.normalizer(array, modality=self.modality))
         normalized_image = sitk.GetImageFromArray(normalized_array)
         normalized_image.CopyInformation(image)
         return normalized_image
 
-    def new_image_preprocessing(self, input_path, normalize=True, resample=True):
+    def image_preprocessing(self, input_path: str, normalize=True, resample=True) -> sitk.Image:
         """
-        Предобработка медицинского изображения: загрузка, ресэмплинг, нормализация и, при необходимости, сохранение
-        предобработанного изображения.
+        Предобработка изображения
 
-        :param input_path: Путь к входному изображению (строка).
-        :return: Предобработанное изображение в виде объекта SimpleITK.
-        :raises ValueError: Если input_path не является допустимым путем к файлу или изображение не может быть прочитано.
+        Параметры:
+        - input_path (str): Путь к входному изображению
+        - normalize (bool): Флаг, указывающий, нужно ли нормализовать изображение
+        - resample (bool): Флаг, указывающий, нужно ли ресэмплировать изображение
+
+        Возвращает:
+        - sitk.Image: Предобработанное изображение
         """
         logging.info('Loading image')
         if isinstance(input_path, str) and os.path.isfile(input_path):
@@ -96,17 +123,21 @@ class Preprocessor:
                 output_path = 'image' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.nii'
                 sitk.WriteImage(final_image, output_path)
         else:
+            logging.error('Error reading image Filepath or SimpleITK object')
             raise ValueError('Error reading image Filepath or SimpleITK object')
 
         return final_image
 
-    def mask_preprocessing(self, input_path, resample=True):
+    def mask_preprocessing(self, input_path: str, resample=True) -> sitk.Image:
         """
-        Предобработка маски: загрузка, ресэмплинг и, при необходимости, сохранение предобработанной маски.
+        Предобработка маски
 
-        :param input_path: Путь к входной маске (строка).
-        :return: Предобработанная маска в виде объекта SimpleITK.
-        :raises ValueError: Если input_path не является допустимым путем к файлу или маска не может быть прочитана.
+        Параметры:
+        - input_path (str): Путь к входной маске
+        - resample (bool): Флаг, указывающий, нужно ли ресэмплировать маску
+
+        Возвращает:
+        - sitk.Image: Предобработанная маска
         """
         logging.info('Loading mask')
         if isinstance(input_path, str) and os.path.isfile(input_path):
@@ -135,11 +166,25 @@ class Preprocessor:
                 output_path = 'mask' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.nii'
                 sitk.WriteImage(result_mask, output_path)
         else:
+            logging.error('Error reading mask Filepath or SimpleITK object')
             raise ValueError('Error reading mask Filepath or SimpleITK object')
 
         return result_mask
 
-    def preprocessing_step(self, image_path, mask_path, normalize=True, resample=True):
-        new_image = self.new_image_preprocessing(image_path, normalize=normalize, resample=resample)
+    def preprocessing_step(self, image_path: str, mask_path: str, normalize=True, resample=True) -> tuple:
+        """
+        Предобработка изображения и маски
+
+        Параметры:
+        - image_path (str): Путь к входному изображению
+        - mask_path (str): Путь к входной маске
+        - normalize (bool): Флаг, указывающий, нужно ли нормализовать изображение
+        - resample (bool): Флаг, указывающий, нужно ли ресэмплировать изображение и маску
+
+        Возвращает:
+        - sitk.Image: Предобработанное изображение
+        - sitk.Image: Предобработанная маска
+        """
+        new_image = self.image_preprocessing(image_path, normalize=normalize, resample=resample)
         new_mask = self.mask_preprocessing(mask_path, resample=resample)
         return new_image, new_mask

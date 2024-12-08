@@ -52,7 +52,7 @@ def main():
     st.markdown(
         """
         <h1 style="text-align: center; margin-top: 0;">
-            Radiomics Predictor
+            Liver lesion group predictor
         </h1>
         """,
         unsafe_allow_html=True
