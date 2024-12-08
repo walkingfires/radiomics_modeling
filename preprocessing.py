@@ -32,7 +32,7 @@ class Preprocessor:
         - mri_modality (str): Модальность МРТ, может быть 'T1' или 'T2'
         - save (bool): Флаг, указывающий, нужно ли сохранять обработанные данные
         """
-        logging.info('Initializing Preprocessor class.')
+        logging.info('Preprocessor: Initializing Preprocessor class.')
         self.save = save
         self.normalizer = ZScoreNormalize()
         if mri_modality == 'T1':
@@ -40,7 +40,7 @@ class Preprocessor:
         elif mri_modality == 'T2':
             self.modality = Modality.T2
         else:
-            logging.error('Invalid modality choice')
+            logging.error('Preprocessor: Invalid modality choice')
             raise ValueError("Invalid modality choice. Choose 'T1' or 'T2'")
 
     @staticmethod
@@ -54,7 +54,7 @@ class Preprocessor:
         Возвращает:
         - sitk.Image: Нормализованное изображение
         """
-        logging.info('Normalizing image')
+        logging.info('Preprocessor: Normalizing image')
         flatten_image_array = sitk.GetArrayFromImage(image).flatten()
         mu, std = np.mean(flatten_image_array), np.std(flatten_image_array)
         normalized_image = (image - mu) / std
@@ -71,7 +71,7 @@ class Preprocessor:
         Возвращает:
         - sitk.Image: Нормализованное изображение
         """
-        logging.info('Normalizing image intensity')
+        logging.info('Preprocessor: Normalizing image intensity')
         array = np.asanyarray(sitk.GetArrayFromImage(image))
         normalized_array = np.asanyarray(self.normalizer(array, modality=self.modality))
         normalized_image = sitk.GetImageFromArray(normalized_array)
@@ -90,20 +90,20 @@ class Preprocessor:
         Возвращает:
         - sitk.Image: Предобработанное изображение
         """
-        logging.info('Loading image')
+        logging.info('Preprocessor: Loading image')
         if isinstance(input_path, str) and os.path.isfile(input_path):
-            logging.info('Preprocessing image')
+            logging.info('Preprocessor: Preprocessing image')
             image = sitk.ReadImage(input_path)
 
             final_image = image
 
             if normalize:
-                logging.info('Normalizing image')
+                logging.info('Preprocessor: Normalizing image')
                 # final_image = self.normalize(image)
                 final_image = self.intensity_normalize(image)
 
             if resample:
-                logging.info('Resampling image')
+                logging.info('Preprocessor: Resampling image')
                 resampled_image = sitk.Resample(
                     image1=final_image,
                     size=np.rint(
@@ -120,11 +120,12 @@ class Preprocessor:
 
             # TODO: make file path
             if self.save:
+                logging.info('Preprocessor: Saving image')
                 output_path = 'image' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.nii'
                 sitk.WriteImage(final_image, output_path)
         else:
-            logging.error('Error reading image Filepath or SimpleITK object')
-            raise ValueError('Error reading image Filepath or SimpleITK object')
+            logging.error('Preprocessor: Error reading image Filepath or SimpleITK object')
+            raise ValueError('Preprocessor: Error reading image Filepath or SimpleITK object')
 
         return final_image
 
@@ -139,16 +140,16 @@ class Preprocessor:
         Возвращает:
         - sitk.Image: Предобработанная маска
         """
-        logging.info('Loading mask')
+        logging.info('Preprocessor: Loading mask')
         if isinstance(input_path, str) and os.path.isfile(input_path):
-            logging.info('Preprocessing mask')
+            logging.info('Preprocessor: Preprocessing mask')
 
-            mask = sitk.ReadImage(input_path)  # Загрузка маски
+            mask = sitk.ReadImage(input_path)
 
             result_mask = mask
 
             if resample:
-                logging.info('Resampling mask')
+                logging.info('Preprocessor: Resampling mask')
                 preprocessing_mask = sitk.Resample(
                     image1=mask,
                     size=np.rint(mask.GetSize() * np.array(mask.GetSpacing()) / (1, 1, 1)).astype(int).tolist(),
@@ -163,11 +164,12 @@ class Preprocessor:
 
             # TODO: make file path and check labels in mask
             if self.save:
+                logging.info('Preprocessor: Saving mask')
                 output_path = 'mask' + datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.nii'
                 sitk.WriteImage(result_mask, output_path)
         else:
-            logging.error('Error reading mask Filepath or SimpleITK object')
-            raise ValueError('Error reading mask Filepath or SimpleITK object')
+            logging.error('Preprocessor: Error reading mask Filepath or SimpleITK object')
+            raise ValueError('Preprocessor: Error reading mask Filepath or SimpleITK object')
 
         return result_mask
 
