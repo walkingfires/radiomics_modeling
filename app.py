@@ -107,6 +107,7 @@ def main():
         if t2_mri is not None and mask is not None:
             save_uploaded_file(t2_mri, os.path.join("static", t2_mri.name))
             save_uploaded_file(mask, os.path.join("static", mask.name))
+
             clinical_data = {
                 'age': age,
                 'sex': 'F' if gender == 'Female' else 'M',
