@@ -22,7 +22,7 @@ class FeatureExtractor:
         Инициализация класса FeatureExtractor
 
         Параметры:
-        - model (str): Название модели, используемой для извлечения признаков): Модель, используемая для извлечения признаков
+        - model (str): Название модели, используемой для извлечения признаков
         - desired_order_bool (bool): Флаг, указывающий, нужно ли использовать желаемый порядок признаков
         """
         logging.info('Initializing FeatureExtractor class')
