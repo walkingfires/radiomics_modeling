@@ -10,8 +10,8 @@ class ImageViewer:
     Класс ImageViewer предназначен для отображения медицинских изображений и масок
 
     Атрибуты:
-    - image: Медицинское изображение в форме sitk.Image
-    - mask: Медицинская маска в форме sitk.Image
+    - image (sitk.Image): Медицинское изображение в форме sitk.Image
+    - mask (sitk.Image): Медицинская маска в форме sitk.Image
 
     Методы:
     - __init__(self, image: sitk.Image, mask: sitk.Image): Инициализация класса ImageViewer
@@ -22,8 +22,8 @@ class ImageViewer:
         Инициализация класса ImageViewer
 
         Параметры:
-        - image: Медицинское изображение в форме sitk.Image
-        - mask: Медицинская маска в форме sitk.Image
+        - image (sitk.Image): Медицинское изображение в форме sitk.Image
+        - mask (sitk.Image): Медицинская маска в форме sitk.Image
         """
         logging.info('ImageViewer: Loading image and mask')
         self.image = sitk.GetArrayFromImage(image)

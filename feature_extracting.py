@@ -22,8 +22,8 @@ class FeatureExtractor:
         Инициализация класса FeatureExtractor
 
         Параметры:
-        - model: Модель, используемая для извлечения признаков
-        - desired_order_bool: Флаг, указывающий, нужно ли использовать желаемый порядок признаков
+        - model (str): Название модели, используемой для извлечения признаков): Модель, используемая для извлечения признаков
+        - desired_order_bool (bool): Флаг, указывающий, нужно ли использовать желаемый порядок признаков
         """
         logging.info('Initializing FeatureExtractor class')
         self.model = model
@@ -51,11 +51,11 @@ class FeatureExtractor:
         Извлечение признаков из изображения и маски
 
         Параметры:
-        - image: Входное изображение
-        - mask: Входная маска
+        - image (sitk.Image): Входное изображение
+        - mask (sitk.Image): Входная маска
 
         Возвращает:
-        - model_features: Словарь с извлеченными признаками
+        - model_features (dict): Словарь с извлеченными признаками
         """
         logging.info('Extractor: Extracting features')
         extracted_features = self.extractor.execute(image, mask)

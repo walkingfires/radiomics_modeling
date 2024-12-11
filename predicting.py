@@ -20,7 +20,7 @@ class Predictor:
         Инициализация класса Predictor
 
         Параметры:
-        - model: Название модели, используемой для предсказания
+        - model (str): Название модели, используемой для предсказания
         """
         logging.info("Predictor: Loading model")
         if isinstance(model, str) and os.path.isfile(f'models/{model}_model.joblib'):
@@ -34,10 +34,10 @@ class Predictor:
         Предсказание на основе входных данных
 
         Параметры:
-        - data: Входные данные для предсказания
+        - data (dict): Входные данные для предсказания
 
         Возвращает:
-        - prediction: Предсказание
+        - prediction (int): Предсказание
         """
         logging.info("Predictor: Predicting")
         prediction = self.classifier.predict(pd.DataFrame([data]))

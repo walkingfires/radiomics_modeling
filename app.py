@@ -12,13 +12,13 @@ def process_result(image_name: str, mask_name: str, clinical_data: dict, show: b
     Подготовка результата: загрузка, предобработка, извлечение признаков и предсказание
 
     Параметры:
-    - image_name: Имя файла изображения
-    - mask_name: Имя файла маски
-    - clinical_data: Клинические данные
-    - show: Флаг, указывающий, нужно ли отобразить изображение
+    - image_name (str): Имя файла изображения
+    - mask_name (str): Имя файла маски
+    - clinical_data (dict): Клинические данные
+    - show (bool): Флаг, указывающий, нужно ли отобразить изображение
 
     Возвращает:
-    - result: Результат предсказания
+    - result (int): Результат предсказания
     """
     logging.info('App: Prosessing result')
     model = 'liver_t2w_xgboost'

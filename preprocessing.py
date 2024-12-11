@@ -52,7 +52,7 @@ class Preprocessor:
         - image (sitk.Image): Входное изображение
 
         Возвращает:
-        - sitk.Image: Нормализованное изображение
+        - normalized_image (sitk.Image): Нормализованное изображение
         """
         logging.info('Preprocessor: Normalizing image')
         flatten_image_array = sitk.GetArrayFromImage(image).flatten()
@@ -69,7 +69,7 @@ class Preprocessor:
         - image (sitk.Image): Входное изображение
 
         Возвращает:
-        - sitk.Image: Нормализованное изображение
+        - normalized_image (sitk.Image): Нормализованное изображение
         """
         logging.info('Preprocessor: Normalizing image intensity')
         array = np.asanyarray(sitk.GetArrayFromImage(image))
@@ -88,7 +88,7 @@ class Preprocessor:
         - resample (bool): Флаг, указывающий, нужно ли ресэмплировать изображение
 
         Возвращает:
-        - sitk.Image: Предобработанное изображение
+        - final_image (sitk.Image): Предобработанное изображение
         """
         logging.info('Preprocessor: Loading image')
         if isinstance(input_path, str) and os.path.isfile(input_path):
@@ -138,7 +138,7 @@ class Preprocessor:
         - resample (bool): Флаг, указывающий, нужно ли ресэмплировать маску
 
         Возвращает:
-        - sitk.Image: Предобработанная маска
+        - result_mask (sitk.Image): Предобработанная маска
         """
         logging.info('Preprocessor: Loading mask')
         if isinstance(input_path, str) and os.path.isfile(input_path):
@@ -184,8 +184,8 @@ class Preprocessor:
         - resample (bool): Флаг, указывающий, нужно ли ресэмплировать изображение и маску
 
         Возвращает:
-        - sitk.Image: Предобработанное изображение
-        - sitk.Image: Предобработанная маска
+        - new_image (sitk.Image): Предобработанное изображение
+        - new_mask (sitk.Image): Предобработанная маска
         """
         new_image = self.image_preprocessing(image_path, normalize=normalize, resample=resample)
         new_mask = self.mask_preprocessing(mask_path, resample=resample)
