@@ -64,7 +64,7 @@ def main():
         os.mkdir("static")
 
     st.set_page_config(
-        page_title="Radiomics Predictor",
+        page_title="Liver lesion group predictor",
         page_icon="🧊")
 
     st.markdown(
@@ -81,7 +81,7 @@ def main():
     col1.metric("ROC-AUC", "0.9")
     col2.metric("F1-Score", "0.89")
 
-    st.subheader("MRI Upload")
+    st.subheader("Data Upload")
 
     col1, col2 = st.columns(2)
 
