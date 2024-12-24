@@ -20,7 +20,7 @@ def process_result(image_name: str, mask_name: str, clinical_data: dict, show: b
     Возвращает:
     - result (int): Результат предсказания
     """
-    logging.info('App: Prosessing result')
+    logging.info('App: Processing result')
     model = 'liver_t2w_xgboost'
     preprocessor = Preprocessor(mri_modality='T2')
     feature_extractor = FeatureExtractor(model, desired_order_bool=False)
